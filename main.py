@@ -5,15 +5,15 @@ from matplotlib import pyplot as plt
 import os
 import math
 
-resolution_var = 0
+resolution_var = 1
 
-width = [400, 800, 1280, 1920][resolution_var]
-height = [300, 600, 720, 1080][resolution_var]
+width = [400, 800, 1280][resolution_var]
+height = [300, 600, 720][resolution_var]
 
-no_frames = 150
+no_frames = 900
 fps = 30
 
-free_space_ratio = 1300
+free_space_ratio = 2000
 
 initial_velocity_limit = 5
 critical_distance = 50
@@ -24,7 +24,7 @@ drag_coef = 0.8
 
 # np.array([0, 255, 255], np.uint8)
 single_bird = np.array([0, 0, 0], np.uint8)
-single_sky = np.array([0, 0, 0], np.uint8)
+single_sky = np.array([255, 255, 255], np.uint8)
 
 # SKY = np.full((height, width, 3), single_sky[0], dtype=np.uint8)
 
@@ -39,6 +39,8 @@ STARLINGS = np.array([[], [], [], [], [], []], dtype=np.int32)
 
 
 total_energy_trend = []
+
+vid_no_var = 0
 
 
 ###
@@ -70,6 +72,7 @@ def total_energy():
 def energy_plotter():
     x_list = np.array([i for i in range(len(total_energy_trend))])
     plt.plot(x_list, total_energy_trend)
+    plt.title("Total Kinetic Energy vs Time plot")
     plt.show()
 
 
@@ -186,39 +189,37 @@ def accerlerator():
 
 
 def main():
+    global vid_no_var
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    print(total_energy(), total_momentum())
-    vid_no_var = 0
+    # print(total_energy(), total_momentum())
     while 1:
-        if not os.path.exists(f'starlingssss{vid_no_var}.mp4'):
+        if not os.path.exists(f'starlings_{vid_no_var}.mp4'):
             out = cv2.VideoWriter(
-                f'starlingssss{vid_no_var}.mp4', fourcc, fps, (width, height))
+                f'starlings_{vid_no_var}.mp4', fourcc, fps, (width, height))
             break
         vid_no_var += 1
 
     for frame in range(no_frames):
         total_energy_trend.append(total_energy())
-        print(f'\r{frame+1}/{no_frames}\t{total_energy()}', end='\t')
+        print(f'\r{frame+1}/{no_frames}', end='\t')
         forcer()
 
         accerlerator()
-        if sum(STARLINGS[4]) or sum(STARLINGS[5]):
-            print('haha', sum(STARLINGS[4]), sum(STARLINGS[5]))
 
         birdmover()
 
         out.write(SKY)
     print('')
 
-    print(total_energy(), total_momentum())
+    # print(total_energy(), total_momentum())
 
 
 main()
 
 
 # force_func_plot(1)
-energy_plotter()
-print('\nDone!')
+# energy_plotter()
+print(f'\nVideo named starlings_{vid_no_var}.mp4 created')
 
 '''
 continuous boundaries
